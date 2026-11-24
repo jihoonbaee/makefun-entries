@@ -1,1 +1,1 @@
-{"name":"one-line-robot-wedding-vows","private":true,"scripts":{"check":"node check.mjs","start":"node main.ts"},"type":"module","version":"1.0.0"}
+{"name":"last-words-before-the-unplugging","private":true,"scripts":{"check":"node check.mjs","start":"node main.ts"},"type":"module","version":"1.0.0"}
