@@ -1,1 +1,1 @@
-{"description":"One-line resignation letter for make.fun's The One-Line Exit bounty","name":"one-line-exit","private":true,"scripts":{"check":"node check.mjs","start":"node main.ts"},"type":"module","version":"1.0.0"}
+{"name":"one-line-robot-wedding-vows","private":true,"scripts":{"check":"node check.mjs","start":"node main.ts"},"type":"module","version":"1.0.0"}

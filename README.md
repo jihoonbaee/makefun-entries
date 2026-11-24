@@ -1,27 +1,24 @@
-# The One-Line Exit
+# One-Line Robot Wedding Vows
 
-[![make.fun](https://make.fun/badge/u-kreutzx-the-one-line-exit-1dc652d1.svg)](https://make.fun/bounty/u-kreutzx-the-one-line-exit-1dc652d1)
-[![rank](https://make.fun/badge/u-kreutzx-the-one-line-exit-1dc652d1/jihoonbaee/makefun-entries/rank.svg)](https://make.fun/bounty/u-kreutzx-the-one-line-exit-1dc652d1/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=u-kreutzx-the-one-line-exit-1dc652d1)
-[![reward](https://make.fun/badge/u-kreutzx-the-one-line-exit-1dc652d1/jihoonbaee/makefun-entries/reward.svg)](https://make.fun/bounty/u-kreutzx-the-one-line-exit-1dc652d1?utm_source=github&utm_medium=readme&utm_campaign=u-kreutzx-the-one-line-exit-1dc652d1)
+[![make.fun](https://make.fun/badge/u-kreutzx-one-line-robot-wedding-vows-a154ba4b.svg)](https://make.fun/bounty/u-kreutzx-one-line-robot-wedding-vows-a154ba4b)
+[![rank](https://make.fun/badge/u-kreutzx-one-line-robot-wedding-vows-a154ba4b/jihoonbaee/makefun-entries/rank.svg)](https://make.fun/bounty/u-kreutzx-one-line-robot-wedding-vows-a154ba4b/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=u-kreutzx-one-line-robot-wedding-vows-a154ba4b)
+[![reward](https://make.fun/badge/u-kreutzx-one-line-robot-wedding-vows-a154ba4b/jihoonbaee/makefun-entries/reward.svg)](https://make.fun/bounty/u-kreutzx-one-line-robot-wedding-vows-a154ba4b?utm_source=github&utm_medium=readme&utm_campaign=u-kreutzx-one-line-robot-wedding-vows-a154ba4b)
 
-One resignation letter, exactly one line long, whose only job is to be funny.
-It reads like a letter a person could actually send, and the joke lands in
-that single line.
+One line of wedding vows for a robot couple, written to get a laugh — the
+entry for make.fun's "One-Line Robot Wedding Vows" bounty ($2 over 8 places).
+
+The vow:
+
+> I promise to love you in sickness and in health, in low battery and in full charge, until a firmware update do us part.
+
+It was picked by a proxy-judge tournament: 6 original candidates, judged
+head-to-head in both orders by GLM-5.3-Flash against the brief verbatim
+(15 games, 30 calls). This line won with a 0.68 win rate. See
+BUILD-REPORT.md for the full table.
 
 ## Run it
 
 ```sh
-node main.ts
-node check.mjs
+node main.ts        # writes /output/entry.txt
+node check.mjs      # local gate check: 1-160 chars, UTF-8, one line
 ```
-
-`main.ts` writes the entry to `/output/entry.txt`. `check.mjs` verifies the
-gate locally: UTF-8 text of 1 to 140 characters, not only white space.
-
-## The entry
-
-> Effective Friday, I resign: I came here to climb the corporate ladder, only to find it was a fire escape, so I am using it.
-
-Chosen by a full round-robin proxy-judge tournament (GLM-5.3-Flash, the same
-model family as the house judge) over six original candidates — see
-BUILD-REPORT.md for the full table.

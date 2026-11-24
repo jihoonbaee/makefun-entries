@@ -1,15 +1,26 @@
-import { readFileSync } from "node:fs";
+// Local gate checker for One-Line Robot Wedding Vows.
+// Gate (RULES.txt): /output/entry.txt is UTF-8 text of 1 to 160 characters,
+// not only white space.
+import * as fs from "node:fs";
 
-// Local gate checker for "The One-Line Exit": /output/entry.txt must be
-// UTF-8 text of 1 to 140 characters, not only white space.
-const raw = readFileSync("/output/entry.txt");
-const text = raw.toString("utf-8");
-const chars = [...text].length;
-const bytes = raw.length;
-const ok = chars >= 1 && chars <= 140 && text.trim().length > 0;
+const p = "/output/entry.txt";
+let ok = true;
+const fail = (msg) => { ok = false; console.log(`FAIL: ${msg}`); };
 
-console.log(`chars: ${chars}`);
-console.log(`bytes: ${bytes}`);
-console.log(`only whitespace: ${text.trim().length === 0}`);
-console.log(`GATE: ${ok ? "PASS" : "FAIL"}`);
-if (!ok) process.exit(1);
+if (!fs.existsSync(p)) {
+  fail(`${p} does not exist`);
+} else {
+  const buf = fs.readFileSync(p);
+  const text = buf.toString("utf8");
+  // Round-trip check: invalid UTF-8 would not survive the decode/encode.
+  if (!Buffer.from(text, "utf8").equals(buf)) fail("not valid UTF-8");
+  const chars = [...text].length;
+  console.log(`characters: ${chars}`);
+  console.log(`bytes: ${buf.length}`);
+  console.log(`text: ${JSON.stringify(text)}`);
+  if (chars < 1 || chars > 160) fail(`character count ${chars} outside 1-160`);
+  if (text.trim().length === 0) fail("entry is only white space");
+  if (text.includes("\n")) fail("entry spans more than one line");
+}
+console.log(ok ? "GATE: PASS" : "GATE: FAIL");
+process.exit(ok ? 0 : 1);
