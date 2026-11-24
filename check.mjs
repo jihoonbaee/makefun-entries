@@ -1,60 +1,75 @@
-// Local gate checker — mimics the sealed gate scorer in RULES.txt
-// ("The gate": /output/entry.txt is UTF-8 text of 1 to 200 characters,
-// not only white space) plus the static rules that would disqualify an
-// entry at review: no environment secrets, no network, no eval/dynamic
-// code (RULES.txt, "Everything your entry runs" + thinking_own_work).
+// Standalone verifier for the One-Liner Laugh Lab entry.
 //
-// Usage: node main.ts && node check.mjs
-// Exit 0 = gate passes; exit 1 = gate fails (prints the fix).
+// It replays, on this machine, the two things the entry must survive:
+// the sealed gate on /output/entry.txt (UTF-8, 1 to 200 characters, not
+// blank, exactly one line) and the review rules on the entrypoint
+// itself (no environment reads, no network use, no code assembled from
+// strings while running). Nothing here touches the network or changes a
+// file; it only reads entry.txt and main.ts, then prints a verdict.
+//
+// Run after the entrypoint: node main.ts && node check.mjs
+// Exit status 0 means the gate is satisfied; anything else lists why.
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ENTRY_PATH = "/output/entry.txt";
-let ok = true;
-const fail = (msg) => {
-  ok = false;
-  console.log("FAIL:", msg);
-};
+const ENTRY_FILE = "/output/entry.txt";
+const MAX_CHARS = 200;
 
-if (!existsSync(ENTRY_PATH)) {
-  fail("/output/entry.txt does not exist — run: node main.ts");
-} else {
-  const bytes = readFileSync(ENTRY_PATH);
-  let text;
-  try {
-    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-  } catch {
-    fail("entry.txt is not valid UTF-8");
-    text = "";
-  }
-  if (text.length < 1 || text.length > 200) {
-    fail(`entry is ${text.length} characters (gate needs 1-200)`);
-  }
-  if (!text.trim()) {
-    fail("entry is only white space");
-  }
-  if (text.includes("\n")) {
-    fail("entry is more than one line");
-  }
-  console.log(
-    `entry: ${text.length} chars, ${bytes.length} bytes, valid=${ok ? 1 : 0}`,
-  );
-  console.log("entry text:", JSON.stringify(text));
+const problems = [];
+const note = (detail) => problems.push(detail);
+
+let entryBytes;
+try { entryBytes = readFileSync(ENTRY_FILE); } catch (readError) {
+  note(`cannot read ${ENTRY_FILE} — run the entrypoint first`);
 }
 
-// Static review rules: the program must be self-contained.
-const src = readFileSync(new URL("./main.ts", import.meta.url), "utf8");
-for (const [pattern, why] of [
-  ["process.env", "reads an environment value"],
-  ["os.environ", "reads an environment value"],
-  ["eval(", "runs code from a string"],
-  ["new Function", "runs code from a string"],
-  ["fetch(", "reads from the network"],
-  ["http", "reads from the network"],
-  ["dynamic import", "dynamic import"],
-]) {
-  if (src.includes(pattern)) fail(`main.ts contains ${pattern} (${why})`);
+let entryText = "";
+let decodedOk = false;
+if (entryBytes !== undefined) {
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  try { entryText = decoder.decode(entryBytes); decodedOk = true; } catch (decodeError) {
+    note("entry.txt does not decode as UTF-8");
+  }
 }
 
-console.log(ok ? "GATE: PASS" : "GATE: FAIL");
-process.exit(ok ? 0 : 1);
+if (decodedOk) {
+  if (entryText.length < 1 || entryText.length > MAX_CHARS) {
+    note(`entry holds ${entryText.length} characters; the gate allows 1 to ${MAX_CHARS}`);
+  }
+  if (entryText.trim() === "") {
+    note("entry is blank");
+  }
+  if (entryText.indexOf("\n") >= 0) {
+    note("entry spans more than one line");
+  }
+  console.log(`entry file: ${entryText.length} characters, ${entryBytes.length} bytes`);
+  console.log(`entry content: ${JSON.stringify(entryText)}`);
+}
+
+// The entrypoint must stand on its own: nothing read from elsewhere.
+const here = dirname(fileURLToPath(import.meta.url));
+const source = readFileSync(join(here, "main.ts"), "utf8");
+
+const banned = [
+  { needle: "process.env", reason: "environment access" },
+  { needle: "os.environ", reason: "environment access" },
+  { needle: "eval(", reason: "code assembled from a string" },
+  { needle: "new Function", reason: "code assembled from a string" },
+  { needle: "fetch(", reason: "network access" },
+  { needle: "http", reason: "network access" },
+  { needle: "dynamic import", reason: "code loaded at run time" },
+];
+
+for (const rule of banned) {
+  if (source.includes(rule.needle)) {
+    note(`main.ts uses ${rule.needle} (${rule.reason})`);
+  }
+}
+
+for (const problem of problems) {
+  console.log("problem:", problem);
+}
+console.log("GATE: " + (problems.length === 0 ? "PASS" : "FAIL"));
+process.exitCode = problems.length === 0 ? 0 : 1;
