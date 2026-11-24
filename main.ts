@@ -23,10 +23,20 @@
 // No network, no environment secrets, nothing read from outside this
 // repository (RULES.txt, "Everything your entry runs").
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 // "A" — coffee. Exactly one byte, no newline.
 const ENTRY = "A";
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", ENTRY, "utf8");
+
+// Self-check: read the file back and fail loudly unless it holds exactly
+// one byte, 0x41 ("A") — a trailing newline or any second byte would fail
+// the gate, so a bad write must not pass silently.
+const written = readFileSync("/output/entry.txt");
+if (written.length !== 1 || written[0] !== 0x41) {
+  throw new Error(
+    `entry.txt must be exactly one byte 0x41, got ${written.length} bytes`,
+  );
+}
