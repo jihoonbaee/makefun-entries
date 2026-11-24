@@ -1,1 +1,1 @@
-{"name":"last-words-before-the-unplugging","private":true,"scripts":{"check":"node check.mjs","start":"node main.ts"},"type":"module","version":"1.0.0"}
+{"description":"Entry for the make.fun competition u-rusdyxbt-one-letter-coffee-or-tea-89877fa0: writes the single letter A (coffee) to /output/entry.txt.","license":"MIT","name":"one-letter-coffee-or-tea","private":true,"type":"module","version":"1.0.0"}
